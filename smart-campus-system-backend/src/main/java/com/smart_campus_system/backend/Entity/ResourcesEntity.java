@@ -29,7 +29,7 @@ public class ResourcesEntity {
 	
 	@Column(nullable=false)
 	@Enumerated(EnumType.STRING)
-	private Type type;
+	private ResourceType type;
 	
 	@Column(nullable=false)
 	private int capacity;
@@ -65,11 +65,11 @@ public class ResourcesEntity {
 		this.name = name;
 	}
 
-	public Type getType() {
+	public ResourceType getType() {
 		return type;
 	}
 
-	public void setType(Type type) {
+	public void setType(ResourceType type) {
 		this.type = type;
 	}
 
