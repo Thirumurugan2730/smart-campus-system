@@ -9,6 +9,7 @@ import com.smart_campus_system.backend.DTO.BookingRequestDTO;
 import com.smart_campus_system.backend.Entity.BookingEntity;
 import com.smart_campus_system.backend.Entity.BookingStatus;
 import com.smart_campus_system.backend.Entity.ResourcesEntity;
+import com.smart_campus_system.backend.Entity.Role;
 import com.smart_campus_system.backend.Entity.UserEntity;
 import com.smart_campus_system.backend.Repository.BookingRepository;
 import com.smart_campus_system.backend.Repository.ResourceRepository;
@@ -24,18 +25,41 @@ public class BookingService {
 	ResourceRepository resourceRepository;
 	
 	public BookingEntity create(BookingRequestDTO dto){
-		UserEntity userEntity=userRepository.findById(dto.getUserId()).orElseThrow();
+		UserEntity user =userRepository.findById(dto.getUserId()).orElseThrow();
+		ResourcesEntity resource =resourceRepository.findById(dto.getResourceId()).orElseThrow();
 		
-		ResourcesEntity resourceEntity=resourceRepository.findById(dto.resourceId).orElseThrow();
+		int newPriority=getpriority(user.getRole());
 		
-		BookingEntity current=new BookingEntity();
-		current.setUser(userEntity);
-		current.setResource(resourceEntity);
-		current.setBookingDate(dto.getBookingDate());
-		current.setStartTime(dto.getStartTime());
-		current.setEndTime(dto.getEndTime());
-		current.setStatus(BookingStatus.PENDING);
-		return repository.save(current);
+		List<BookingEntity> conflicts =repository.findConflictBookings(dto.getResourceId(),dto.getBookingDate(),
+				                                   dto.getStartTime(),dto.getEndTime());
+		BookingEntity newBooking =new BookingEntity();
+		newBooking.setUser(user);
+		newBooking.setResource(resource);
+		newBooking.setStartTime(dto.getStartTime());
+		newBooking.setEndTime(dto.getEndTime());
+		newBooking.setPurpose(dto.getPurpose());
+		newBooking.setStatus(BookingStatus.PENDING);
+		
+		if(conflicts.isEmpty()){
+			repository.save(newBooking);
+		}
+		for(BookingEntity oldBooking :conflicts) {
+			UserEntity u=oldBooking.getUser();
+			int oldPriority=getpriority(user.getRole());
+			
+			if(newPriority<oldPriority) {
+				newBooking.setStatus(BookingStatus.REJECTED);
+			}
+			else if(newPriority==oldPriority) {
+				newBooking.setStatus(BookingStatus.PENDING);
+			}else {
+				oldBooking.setStatus(BookingStatus.REJECTED);
+				newBooking.setStatus(BookingStatus.PENDING);
+				repository.save(oldBooking);
+			}
+			
+		}
+		return repository.save(newBooking);
 		
 	}
 	
@@ -45,6 +69,15 @@ public class BookingService {
 	
 	public List<BookingEntity> getall(){
 		return repository.findAll();
+	}
+	int getpriority(Role role) {
+		if(role.equals(Role.ADMIN)) {
+			return 3;
+		}else if(role.equals(Role.FACULTY)) {
+			return 2;
+		}else {
+			return 1;
+		}
 	}
 	
 	

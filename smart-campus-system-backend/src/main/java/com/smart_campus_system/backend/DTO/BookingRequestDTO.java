@@ -4,11 +4,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class BookingRequestDTO {
-    public int userId;
-    public int resourceId;
-    public LocalDate bookingDate;
-    public LocalTime startTime;
-    public LocalTime endTime;
+    private int userId;
+    private int resourceId;
+    private LocalDate bookingDate;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private String purpose;
 	public int getUserId() {
 		return userId;
 	}
@@ -39,5 +40,12 @@ public class BookingRequestDTO {
 	public void setEndTime(LocalTime endTime) {
 		this.endTime = endTime;
 	}
+	public String getPurpose() {
+		return purpose;
+	}
+	public void setPurpose(String purpose) {
+		this.purpose = purpose;
+	}
+	
     
 }

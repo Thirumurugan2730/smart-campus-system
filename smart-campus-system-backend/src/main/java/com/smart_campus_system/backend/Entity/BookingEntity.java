@@ -44,6 +44,9 @@ public class BookingEntity {
 	@Column(name="end_time",nullable=false)
 	private LocalTime endTime;
 	
+	@Column(name="purpose",nullable=false)
+	private String purpose;
+	
 	@Enumerated(EnumType.STRING)
 	@Column
 	private BookingStatus status;
@@ -110,6 +113,14 @@ public class BookingEntity {
 
 	public void setStatus(BookingStatus status) {
 		this.status = status;
+	}
+	
+	public String getPurpose() {
+		return purpose;
+	}
+
+	public void setPurpose(String purpose) {
+		this.purpose = purpose;
 	}
 
 	public LocalDateTime getCreatedAt() {
