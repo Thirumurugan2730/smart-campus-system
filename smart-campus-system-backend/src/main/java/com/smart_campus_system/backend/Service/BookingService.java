@@ -24,9 +24,22 @@ public class BookingService {
 	@Autowired
 	ResourceRepository resourceRepository;
 	
+	public List<BookingEntity> getAll(){
+		return repository.findAll();
+	}
+	
+	public BookingEntity getById(int id) {
+		return repository.findById(id).orElseThrow();
+	}
+	
 	public BookingEntity create(BookingRequestDTO dto){
+		
+		System.out.println("UserId from DTO = " + dto.getUserId());
+		System.out.println("ResourceId from DTO = " + dto.getResourceId());
+		
 		UserEntity user =userRepository.findById(dto.getUserId()).orElseThrow();
 		ResourcesEntity resource =resourceRepository.findById(dto.getResourceId()).orElseThrow();
+
 		
 		int newPriority=getpriority(user.getRole());
 		
@@ -35,6 +48,7 @@ public class BookingService {
 		BookingEntity newBooking =new BookingEntity();
 		newBooking.setUser(user);
 		newBooking.setResource(resource);
+		newBooking.setBookingDate(dto.getBookingDate());
 		newBooking.setStartTime(dto.getStartTime());
 		newBooking.setEndTime(dto.getEndTime());
 		newBooking.setPurpose(dto.getPurpose());
@@ -45,7 +59,7 @@ public class BookingService {
 		}
 		for(BookingEntity oldBooking :conflicts) {
 			UserEntity u=oldBooking.getUser();
-			int oldPriority=getpriority(user.getRole());
+			int oldPriority=getpriority(u.getRole());
 			
 			if(newPriority<oldPriority) {
 				newBooking.setStatus(BookingStatus.REJECTED);
@@ -63,13 +77,6 @@ public class BookingService {
 		
 	}
 	
-	public BookingEntity get(int id) {
-		return repository.findById(id).orElse(null);
-	}
-	
-	public List<BookingEntity> getall(){
-		return repository.findAll();
-	}
 	int getpriority(Role role) {
 		if(role.equals(Role.ADMIN)) {
 			return 3;
@@ -80,6 +87,25 @@ public class BookingService {
 		}
 	}
 	
+	public BookingEntity update(int id,BookingRequestDTO dto) {
+		BookingEntity data=repository.findById(id).orElseThrow();
+		UserEntity user=userRepository.findById(dto.getUserId()).orElseThrow();
+		ResourcesEntity resource=resourceRepository.findById(dto.getResourceId()).orElseThrow();
+		
+		data.setUser(user);
+		data.setResource(resource);
+		data.setBookingDate(dto.getBookingDate());
+		data.setStartTime(dto.getStartTime());
+		data.setEndTime(dto.getEndTime());
+		data.setPurpose(dto.getPurpose());
+		
+		return repository.save(data);
+		
+	}
+	
+	public void delete(int id) {
+		repository.deleteById(id);
+	}
 	
 
 }

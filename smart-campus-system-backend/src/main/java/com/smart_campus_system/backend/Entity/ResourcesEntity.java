@@ -22,7 +22,7 @@ public class ResourcesEntity {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="resources_id")
-	private int resourcesID;
+	private int resourceId;
 	
 	@Column(nullable=false,unique=true)
 	private String name;
@@ -50,11 +50,11 @@ public class ResourcesEntity {
 	private LocalDateTime updatedAt;
 
 	public int getResourcesID() {
-		return resourcesID;
+		return resourceId;
 	}
 
 	public void setResourcesID(int resourcesID) {
-		this.resourcesID = resourcesID;
+		this.resourceId = resourcesID;
 	}
 
 	public String getName() {
